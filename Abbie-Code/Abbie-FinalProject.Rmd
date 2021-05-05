@@ -10,3 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 ```
+
+```{r}
+wildfires <- read.csv("/Users/Abbie/OneDrive - Smith College/Spring 2021/SDS235/Wildfires+Weather/FW_Veg_Rem_Combined.csv")
+```
+
