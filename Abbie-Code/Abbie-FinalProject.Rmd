@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(usmap)
 library(sf)
+library(plotly)
 ```
 
 ```{r}
@@ -174,6 +175,18 @@ PR <- wildfires %>%
   filter(state == "PR")
 ```
 
+```{r}
+# Cause of Fire
+
+cause <- wildfires %>% 
+  group_by(stat_cause_descr) %>% 
+  count(stat_cause_descr)
+
+cause_by_state <- wildfires %>% 
+  group_by(state, stat_cause_descr) %>% 
+  count(stat_cause_descr)
+```
+
 
 
 
@@ -184,9 +197,14 @@ PR <- wildfires %>%
 
 
 ```{r}
-crude_map <- ggplot(wildfires, aes(x = longitude, y = latitude)) +
+crude_map <- ggplot(wildfires, aes(x = longitude, y = latitude, color = stat_cause_descr)) +
   geom_point()
 crude_map
+
+cause_plot <- ggplot(cause_by_state, aes(x = stat_cause_descr, y = n)) +
+  geom_col() +
+  facet_wrap(~state)
+cause_plot
 ```
 
 
