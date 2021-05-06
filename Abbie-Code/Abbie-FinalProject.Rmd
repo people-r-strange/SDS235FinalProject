@@ -9,9 +9,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(usmap)
+library(sf)
 ```
 
 ```{r}
 wildfires <- read.csv("/Users/Abbie/OneDrive - Smith College/Spring 2021/SDS235/Wildfires+Weather/FW_Veg_Rem_Combined.csv")
 ```
+
+```{r}
+crude_map <- ggplot(wildfires, aes(x = longitude, y = latitude)) +
+  geom_point()
+crude_map
+
+plot_usmap()
+```
+
+```{r}
+
+```
+
 
