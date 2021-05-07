@@ -1,0 +1,96 @@
+---
+title: "Fire Maps"
+author: "Isabel Gomez"
+date: "5/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(leaflet)
+library(sf)
+fire_df <- read_csv("C:/Users/igome/Documents/Smith/Spring_2021/visual analyticsd/Final Project/FW_Veg_Rem_Combined.csv")
+```
+
+
+```{r}
+glimpse(fire_df)
+
+```
+
+```{r}
+#taking sample of one state because data is too big for my computer
+ar_sample <-fire_df %>% filter(state =="AR")
+```
+
+
+```{r}
+coordinates(ar_sample) <- c("longitude", "latitude")
+proj4string(ar_sample) <- CRS("+proj=longlat +datum=WGS84") 
+```
+
+```{r}
+ar_sample
+```
+
+
+```{r}
+#ar_sample
+#converting into an sf object
+ar_fire_sf <- st_as_sf(ar_sample)
+#ar_fire_sf <- st_transform(ar_fire_sf, "+proj=longlat +datum=WGS84") 
+```
+
+
+
+```{r}
+pal <- leaflet::colorNumeric(
+  "YlOrRd",
+  domain = poly$fire_size
+)
+```
+
+```{r}
+poly <- ar_sample %>% st_as_sf(coords = c("longitude", "latitude")) #%>%
+ # summarise(geometry = st_combine(geometry))# %>%
+#  st_cast("POLYGON")
+```
+
+
+```{r}
+leaflet::leaflet(poly) %>% 
+  addTiles() %>%
+  leaflet::addPolylines(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(fire_size), fillOpacity = 0.7,
+    label = ~lapply(fire_size, htmltools::HTML),
+    labelOptions = leaflet::labelOptions(direction = "top"),
+    highlight = leaflet::highlightOptions(
+      color = "#FFF", bringToFront = TRUE
+    ))
+  # ) %>%
+  # leaflet::addLegend(
+  #   pal = pal, values = ~fire_size, opacity = 0.7,
+  #   title = "Fie Size", position = "topleft"
+  # )
+```
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
