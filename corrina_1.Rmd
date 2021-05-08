@@ -27,30 +27,94 @@ cause_plot
 wildfires_sample <- wildfires %>%
   head(5)
 
+getColor <- function(wildfires) {
+  sapply(wildfires$fire_size_class, function(fire_size_class) {
+  if(fire_size_class == "B") {
+    "blue"
+  } else if(fire_size_class == "C") {
+    "green"
+  } else if(fire_size_class == "D") {
+    "yellow"
+  } else if(fire_size_class == "E") {
+    "orange"
+  } else if(fire_size_class == "F") {
+    "red"
+  } else {
+    "purple"
+  } })
+}
+
 # convert to tibble 
-sample_tibble <- as_tibble(wildfires_sample)
-class(sample_tibble)
+sample_tibble <- as_tibble(wildfires_sample) %>%
+  mutate(color = getColor(sample_tibble))
+
+getColor(sample_tibble)
+```
+```{r}
+
+iconsL <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "red"
+)
+
+iconsS <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "orange"
+)
 
 library(sf)
 
-sample_tibble %>%
-  st_as_sf(coords = c("longitude", "latitude"))
+#sample_tibble <- sample_tibble %>%
+  #st_as_sf(coords = c("longitude", "latitude")) %>%
+  #mutate(cause = paste("Cause:", stat_cause_descr)) %>%
+  #mutate(size = paste("Size:", fire_size, "acres"))
 
 library(tigris)
 library(leaflet)
 
 states <- states(cb = TRUE)
 
-leaflet(states) %>%
+#nevada1 <- c("NV")
+#nevada <- states(cb = TRUE) %>%
+ # filter_state(states, nevada1)
+
+
+
+
+nevada_map <- states %>% 
+  filter(STATEFP == 32)
+
+nevada_firesL <- wildfires %>%
+  filter(state == "NV") %>%
+  filter(fire_size_class == "D" | fire_size_class == "E" | fire_size_class == "f" | fire_size_class == "G")
+
+nevada_firesS <- wildfires %>%
+  filter(state == "NV") %>%
+  filter(fire_size_class == "B" | fire_size_class == "C")
+
+leaflet(nevada_map) %>%
   addProviderTiles("CartoDB.Positron") %>%
   addPolygons(fillColor = "white",
               color = "black",
               weight = 0.5) %>%
   setView(-98.5795, 39.8282, zoom=3) %>%
   addTiles() %>%
-  addMarkers(~sample_tibble$longitude, ~sample_tibble$latitude,
-                  popup = ~sample_tibble$X1, label = ~sample_tibble$X1)
-  #addMarkers(data = sample_tibble, popup = ~X1)
+  addAwesomeMarkers(~nevada_firesL$longitude, ~nevada_firesL$latitude, icon = iconsL, 
+                  popup = paste("Cause:", nevada_firesL$stat_cause_descr, "<br>",
+                           "Size:", nevada_firesL$fire_size, "acres", "<br>",
+                           "Date Discovered:", nevada_firesL$disc_clean_date), group = "Large") %>%
+  addAwesomeMarkers(~nevada_firesS$longitude, ~nevada_firesS$latitude, icon = iconsS, 
+                  popup = paste("Cause:", nevada_firesS$stat_cause_descr, "<br>",
+                           "Size:", nevada_firesS$fire_size, "acres", "<br>",
+                           "Date Discovered:", nevada_firesS$disc_clean_date), group = "Small") %>%
+  addLayersControl(overlayGroups = c("large", "Small"), options = layersControlOptions(collapsed = FALSE))
+
+
+
 ```
 State shapefiles: 
 https://rdrr.io/cran/tigris/man/states.html
