@@ -12,10 +12,16 @@ library(tidyverse)
 library(usmap)
 library(sf)
 library(plotly)
+library(lubridate)
 ```
 
 ```{r}
 wildfires <- read.csv("/Users/Abbie/OneDrive - Smith College/Spring 2021/SDS235/Wildfires+Weather/FW_Veg_Rem_Combined.csv")
+```
+
+```{r}
+weather_data <- wildfires %>% 
+  filter(weather_file != "File Not Found")
 ```
 
 
@@ -177,7 +183,6 @@ PR <- wildfires %>%
 
 ```{r}
 # Cause of Fire
-
 cause <- wildfires %>% 
   group_by(stat_cause_descr) %>% 
   count(stat_cause_descr)
@@ -187,25 +192,97 @@ cause_by_state <- wildfires %>%
   count(stat_cause_descr)
 ```
 
+```{r}
+wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
+discovery_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(year(disc_clean_date))
 
-
-
-
-
-
-
+num_year_plot <- ggplot(discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line()
+num_year_plot
+```
 
 
 ```{r}
-crude_map <- ggplot(wildfires, aes(x = longitude, y = latitude, color = stat_cause_descr)) +
-  geom_point()
-crude_map
+acreage_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(fire_size = sum(fire_size))
 
-cause_plot <- ggplot(cause_by_state, aes(x = stat_cause_descr, y = n)) +
-  geom_col() +
-  facet_wrap(~state)
-cause_plot
+acreage_year_plot <- ggplot(acreage_year, aes(x = `year(disc_clean_date)`, y = fire_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Acreage Burned Per Year", x = "Year", y = "Number of Acres Burned")
+acreage_year_plot
 ```
+
+```{r}
+# Needs work:
+acreage_state_year <- wildfires %>% 
+  group_by(year(disc_clean_date), state) %>% 
+  summarize(fire_size = sum(fire_size))
+
+acreage_state_plot <- ggplot(acreage_state_year, aes(x = `year(disc_clean_date)`, y = fire_size, fill = state)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~state) +
+  geom_smooth(method = "lm", se = F)
+acreage_state_plot
+```
+
+
+```{r}
+month_breakdown <- wildfires %>% 
+  group_by(month(disc_clean_date)) %>% 
+  count(month(disc_clean_date))
+
+month_breakdown$`month(disc_clean_date)` = month.abb[month_breakdown$`month(disc_clean_date)`]
+
+
+month_plot <- ggplot(month_breakdown, aes(x = `month(disc_clean_date)`, y = n)) +
+  geom_col() +
+  scale_x_discrete(limits = month.abb) +
+  labs(title = "Number of Fires Started in Each Month", x = "Month", y = "Number of Fires")
+month_plot
+```
+
+
+```{r}
+fire_class_breakdown <- wildfires %>% 
+  group_by(fire_size_class) %>% 
+  count(fire_size_class)
+
+fire_class_plot <- ggplot(fire_class_breakdown, aes(x = fire_size_class, y = n)) +
+  geom_col()
+fire_class_plot
+```
+
+
+```{r}
+average_size_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(mean_size = mean(fire_size))
+
+average_size_plot <- ggplot(average_size_year, aes(x = `year(disc_clean_date)`, y = mean_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Average Size of Fire Each Year", x = "Year", y = "Average Size of Fire (in Acres)")
+average_size_plot
+
+```
+
+
+```{r}
+median_size_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(median_size = median(fire_size))
+
+median_size_plot <- ggplot(median_size_year, aes(x = `year(disc_clean_date)`, y = median_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Median Size of Fire Each Year", x = "Year", y = "Median Size of Fire (in Acres)")
+median_size_plot
+```
+
 
 
 
