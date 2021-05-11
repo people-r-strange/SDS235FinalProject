@@ -1,0 +1,117 @@
+---
+title: "WildFire Tracker"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    theme: bootstrap
+runtime: shiny
+---
+
+
+
+States
+=======================================================================
+
+Sidebar {.sidebar}
+----------------------------------------------------------------------
+
+```{r}
+#Define inputs for Drop Down Menu
+ selectInput("State", label = h3("Select a State"), 
+    choices = list("AL" = 1, "AK" = 2, "AZ" = 3, "AR" = 4, "CA" = 5),
+    selected = 20)
+```
+
+### Introduction
+
+Row
+-----------------------------------------------------------------------
+
+### Fire Distribution
+
+```{r}
+#Insert Code for US Fire Distribution Map Here
+```
+
+
+### Fire Size by Census Tract
+```{r}
+#Insert Code for US Fire Size by Census Tract Map Here
+```
+
+Data Visualizations
+=======================================================================
+Sidebar {.sidebar}
+----------------------------------------------------------------------
+
+```{r}
+#Define inputs for Drop Down Menu
+ selectInput("State", label = h3("Select a State"), 
+    choices = list("AL" = 1, "AK" = 2, "AZ" = 3, "AR" = 4, "CA" = 5),
+    selected = 20)
+```
+
+Row
+-----------------------------------------------------------------------
+### Data Viz #1
+```{r}
+#Insert code for data viz #1
+```
+
+### Data Viz #2
+```{r}
+#Insert code for data viz #2
+```
+### Data Viz #3
+```{r}
+#Insert code for data viz #3
+```
+### Data Viz #4
+```{r}
+#Insert code for data viz #4
+```
+
+Row
+-----------------------------------------------------------------------
+### Data Viz #5
+```{r}
+#Insert code for data viz #5
+```
+### Data Viz #6
+```{r}
+#Insert code for data viz #6
+```
+
+
+About
+=======================================================================
+
+**Notes:**
+
+* There are some duplicate rows
+
+* Some rows are missing weather data
+
+* Not all of the columns are documented in the documentation file
+
+* Some of the weather data is completely unrealistic: 
+
+For example, if you sort Temp_pre_30 by lowest to highest, it lists -49°C (-56°F) in Tennessee in November. The lowest recorded temp ever in TN is -32°F.  Also, if you sort highest to lowest and look a few columns over it lists 52°C (125°F) for Wyoming in September.  The highest recorded temperature ever in WY is 115°F. 
+
+* This sample does not include any fires that are class A, which means greater than 0 but less than or equal to 0.25 acres, and there are a significant number of them in the big original data set (almost ⅓ of all fires)
+
+**References:**
+
+* https://stackoverflow.com/questions/36020146/how-can-i-order-the-months-chronologically-in-ggplot2-short-of-writing-the-month
+
+* https://stackoverflow.com/questions/22058393/convert-a-numeric-month-to-a-month-abbreviation/22058435
+
+**Original Dataset**
+
+* https://www.kaggle.com/capcloudcoder/us-wildfire-data-plus-other-attributes?select=Wildfire_att_description.txt
+
+
+
+
