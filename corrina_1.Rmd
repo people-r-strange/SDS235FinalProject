@@ -59,11 +59,18 @@ iconsL <- makeAwesomeIcon(
   markerColor = "red"
 )
 
-iconsS <- makeAwesomeIcon(
+iconsM <- makeAwesomeIcon(
   icon = 'flame',
   iconColor = 'black',
   library = 'ion',
   markerColor = "orange"
+)
+
+iconsS <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "yellow"
 )
 
 library(sf)
@@ -83,10 +90,55 @@ states <- states(cb = TRUE)
  # filter_state(states, nevada1)
 
 
+getmap <- function(state_abr) {
+  map <- states %>% 
+  filter(STUSPS == state_abr)
+  
+  firesL <- wildfires %>%
+  filter(state == state_abr) %>%
+  filter(fire_size_class == "F" | fire_size_class == "G")
+  
+  firesM <- wildfires %>%
+    filter(state == state_abr) %>%
+    filter(fire_size_class == "D" | fire_size_class == "E")
+  
+  firesS <- wildfires %>%
+  filter(state == state_abr) %>%
+  filter(fire_size_class == "B" | fire_size_class == "C")
+  
+  leaflet_map <- leaflet(map) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = "white",
+              color = "black",
+              weight = 0.5) %>%
+  setView(-98.5795, 39.8282, zoom=3) %>%
+  addTiles() %>%
+  addAwesomeMarkers(~firesL$longitude, ~firesL$latitude, icon = iconsL, 
+                  popup = paste("Cause:", firesL$stat_cause_descr, "<br>",
+                           "Size:", firesL$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesL$disc_clean_date), group = "Large") %>%
+  addAwesomeMarkers(~firesM$longitude, ~firesM$latitude, icon = iconsM, 
+                  popup = paste("Cause:", firesM$stat_cause_descr, "<br>",
+                           "Size:", firesM$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesM$disc_clean_date), group = "Medium") %>%
+    addAwesomeMarkers(~firesS$longitude, ~firesS$latitude, icon = iconsS, 
+                  popup = paste("Cause:", firesS$stat_cause_descr, "<br>",
+                           "Size:", firesS$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesS$disc_clean_date), group = "Small") %>%
+  addLayersControl(overlayGroups = c("Large", "Medium", "Small"), options = layersControlOptions(collapsed = FALSE))
+  return(leaflet_map)
+  
+}
 
+getmap("NV")
+
+```
+
+```{r}
+# original code:
 
 nevada_map <- states %>% 
-  filter(STATEFP == 32)
+  filter(STUSPS == "NV")
 
 nevada_firesL <- wildfires %>%
   filter(state == "NV") %>%
