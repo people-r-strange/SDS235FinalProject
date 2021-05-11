@@ -210,7 +210,8 @@ discovery_year <- wildfires %>%
 
 num_year_plot <- ggplot(discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
   geom_line() +
-  labs(title = "Number of Fires Recorded Each Year", x = "Year", y = "Number of Fires")
+  labs(title = "Number of Fires Recorded Each Year", x = "Year", y = "Number of Fires") +
+  geom_smooth(method = "lm", se = F)
 num_year_plot
 ```
 
