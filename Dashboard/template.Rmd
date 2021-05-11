@@ -1,0 +1,40 @@
+---
+title: "WildFire Tracker"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    theme: bootstrap
+runtime: shiny
+---
+
+States
+=======================================================================
+
+Inputs {.sidebar}
+----------------------------------------------------------------------
+### Introduction
+
+
+
+```{r}
+#Define inputs
+ selectInput("State", label = h3("Select a State"), 
+    choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), 
+    selected = 1)
+```
+
+Row
+-----------------------------------------------------------------------
+### Wildfires Across the US
+
+```{r}
+#Insert Code for US Map here
+```
+
+Data
+=======================================================================
+
+Row
+----------------------------------------------------------------------------
