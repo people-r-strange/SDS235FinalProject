@@ -1,0 +1,122 @@
+---
+title: "maps"
+author: "Isabel Gomez"
+date: "5/11/2021"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(leaflet)
+library(sf)
+library(tigris)
+library(dplyr)
+library(magrittr)
+
+fire_df <- read_csv("C:/Users/igome/Documents/Smith/Spring_2021/visual analyticsd/Final Project/FW_Veg_Rem_Combined.csv")
+```
+
+
+```{r}
+glimpse(fire_df)
+
+```
+
+```{r}
+#taking sample of one state because data is too big for my computer
+nv_sample <-fire_df %>% filter(state =="NV")
+
+#states second try
+
+states <- states(cb = TRUE)
+
+nevada_map <- states %>% 
+  filter(STATEFP == 32)
+
+```
+
+
+```{r}
+# convert to tibble 
+sample_tibble <- as_tibble(nv_sample)
+class(sample_tibble)
+
+
+
+library(sf)
+
+sample_tibble %>%
+  st_as_sf(coords = c("longitude", "latitude"))
+
+```
+
+
+```{r}
+leaflet::leaflet(nevada_map) %>% 
+  addTiles() %>%
+  leaflet::addPolygons(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(sample_tibble$fire_size), fillOpacity = 0.7,
+    label = ~lapply(sample_tibble$fire_size, htmltools::HTML),
+    labelOptions = leaflet::labelOptions(direction = "top"),
+    highlight = leaflet::highlightOptions(
+      color = "#FFF", bringToFront = TRUE
+    ))
+```
+
+
+
+```{r}
+coordinates(ar_sample) <- c("longitude", "latitude")
+proj4string(ar_sample) <- CRS("+proj=longlat +datum=WGS84") 
+```
+
+
+
+```{r}
+pal <- leaflet::colorNumeric(
+  "YlOrRd",
+  domain = sample_tibble$fire_size
+)
+```
+
+
+```{r}
+#getting state specific shp file from tigris
+ak <- tracts(state = "NV",refresh = TRUE)
+```
+
+Functioning (for the most part) code: 
+```{r}
+state_fires <- function(st){
+  #read in the data 
+  fire_df <- read_csv("C:/Users/igome/Documents/Smith/Spring_2021/visual analyticsd/Final Project/FW_Veg_Rem_Combined.csv")
+  #take the data frame and sample for state of interest 
+  sample <- fire_df %>% filter(state == st)
+
+  # convert to tibble 
+  sample_tibble <- as_tibble(sample)
+  
+  #getting state specific shp file from tigris
+  ak <- tracts(state = st,refresh = TRUE)
+  
+  #create the leaflet map
+  leaflet::leaflet(ak) %>% 
+  addTiles() %>%
+  leaflet::addPolygons(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(sample_tibble$fire_size), fillOpacity = 0.7,
+    label = ~lapply(sample_tibble$fire_size, htmltools::HTML),
+    labelOptions = leaflet::labelOptions(direction = "top"),
+    highlight = leaflet::highlightOptions(
+      color = "#FFF", bringToFront = TRUE
+    )) %>% 
+   leaflet::addLegend(
+     pal = pal, values = ~sample_tibble$fire_size, opacity = 0.7,
+     title = "Fire Size", position = "topleft"
+   )}
+
+```
+
+
+```{r}
+#Arkansas (AR) does not work for me...
+#Not sure why we get these huge grey color incorporated into the scale 
+state_fires("NV")
+```
