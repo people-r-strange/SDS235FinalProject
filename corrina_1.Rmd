@@ -14,15 +14,8 @@ library(tidyverse)
 wildfires <- read_csv("FW_Veg_Rem_Combined.csv")
 ```
 
-```{r}
-cause_freq <- wildfires %>%
-  group_by(stat_cause_descr) %>%
-  summarize(frequency = n())
+# unused :
 
-cause_plot <- ggplot(data = wildfires, aes(x = stat_cause_descr)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-cause_plot
-```
 ```{r}
 wildfires_sample <- wildfires %>%
   head(5)
@@ -50,6 +43,28 @@ sample_tibble <- as_tibble(wildfires_sample) %>%
 
 getColor(sample_tibble)
 ```
+### use this plus initial import code : 
+
+# US map:
+
+```{r}
+library(tigris)
+library(leaflet)
+
+states <- states(cb = TRUE)
+
+leaflet(states) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = "white",
+              color = "black",
+              weight = 0.5) %>%
+  setView(-98.5795, 39.8282, zoom=3)
+```
+
+
+
+### State maps:
+
 ```{r}
 
 iconsL <- makeAwesomeIcon(
@@ -70,7 +85,7 @@ iconsS <- makeAwesomeIcon(
   icon = 'flame',
   iconColor = 'black',
   library = 'ion',
-  markerColor = "yellow"
+  markerColor = "blue"
 )
 
 library(sf)
