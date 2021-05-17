@@ -31,6 +31,11 @@ filtered_weather_data <- weather_data %>%
   filter(Temp_pre_30 != 0.00000000 | Temp_pre_15 != 0.00000000 | Temp_pre_7 != 0.00000000 | Temp_cont != 0.00000000 | Wind_pre_30 != 0.00000000 | Wind_pre_15 != 0.00000000 | Wind_pre_7 != 0.00000000 | Wind_cont != 0.00000000 | Hum_pre_30 != 0.00000000 | Hum_pre_15 != 0.00000000 | Hum_pre_7 != 0.00000000 | Hum_cont != 0.00000000 | Prec_pre_30 != 0.00000000 | Prec_pre_15 != 0.00000000 | Prec_pre_7 != 0.00000000 | Prec_cont != 0.00000000) 
 ```
 
+```{r}
+big_wildfires <- filtered_weather_data %>% 
+  filter(fire_size_class != "B" & fire_size_class != "C")
+```
+
 
 ```{r}
 # Filtering states
@@ -215,6 +220,17 @@ num_year_plot <- ggplot(discovery_year, aes(x = `year(disc_clean_date)`, y = n))
 num_year_plot
 ```
 
+```{r}
+big_discovery_year <- big_wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(year(disc_clean_date))
+
+big_num_year_plot <- ggplot(big_discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line() +
+  labs(title = "Number of Fires >100 Acres Recorded Each Year", x = "Year", y = "Number of Fires") +
+  geom_smooth(method = "lm", se = F)
+big_num_year_plot
+```
 
 ```{r}
 acreage_year <- wildfires %>% 
@@ -227,6 +243,19 @@ acreage_year_plot <- ggplot(acreage_year, aes(x = `year(disc_clean_date)`, y = f
   labs(title = "Acreage Burned Per Year", x = "Year", y = "Number of Acres Burned")
 acreage_year_plot
 ```
+
+```{r}
+big_acreage_year <- big_wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(fire_size = sum(fire_size))
+
+big_acreage_year_plot <- ggplot(big_acreage_year, aes(x = `year(disc_clean_date)`, y = fire_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Acreage Burned Per Year (From Wildfires >100 Acres)", x = "Year", y = "Number of Acres Burned")
+big_acreage_year_plot
+```
+
 
 ```{r}
 # Needs work:
@@ -257,6 +286,21 @@ month_plot <- ggplot(month_breakdown, aes(x = `month(disc_clean_date)`, y = n)) 
 month_plot
 ```
 
+
+```{r}
+month_breakdown <- wildfires %>% 
+  group_by(month(disc_clean_date)) %>% 
+  count(month(disc_clean_date))
+
+month_breakdown$`month(disc_clean_date)` = month.abb[month_breakdown$`month(disc_clean_date)`]
+
+
+month_plot <- ggplot(month_breakdown, aes(x = `month(disc_clean_date)`, y = n)) +
+  geom_col() +
+  scale_x_discrete(limits = month.abb) +
+  labs(title = "Number of Fires Started in Each Month", x = "Month", y = "Number of Fires")
+month_plot
+```
 
 ```{r}
 fire_class_breakdown <- wildfires %>% 
