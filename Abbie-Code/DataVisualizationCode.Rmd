@@ -1,7 +1,5 @@
 ---
 title: "Data Visualization"
-author: "Abbie Benfield"
-date: "5/17/2021"
 output: html_document
 ---
 
@@ -41,6 +39,30 @@ big_wildfires_weather <- filtered_weather_data %>%
   filter(fire_size_class == "F" | fire_size_class == "G")
 ```
 
+$~$
+$~$
+$~$
+
+```{r, echo = FALSE}
+# Average Size of Fire Each Year
+average_size_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(mean_size = mean(fire_size))
+
+average_size_plot <- ggplot(average_size_year, aes(x = `year(disc_clean_date)`, y = mean_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Average Size of Fire Each Year, 1992-2015", x = "Year", y = "Average Size of Fire (in Acres)")
+ggplotly(average_size_plot)
+```
+
+  > In this graph, we see that 
+  
+$~$
+$~$
+$~$
+
+
 ```{r, echo = FALSE}
 # Cause vs. Average Size of Fire
 mean_size_cause <- wildfires %>% 
@@ -54,6 +76,12 @@ mean_size_cause_plot <- ggplot(mean_size_cause, aes(x = reorder(stat_cause_descr
 ggplotly(mean_size_cause_plot)
 ```
 
+  > In this graph, we see that (note different scale of axes)
+  
+$~$
+$~$
+$~$
+
 
 ```{r, echo = FALSE, fig.show = "hold", out.width = "50%"}
 # Number of Fires Each Year
@@ -63,7 +91,7 @@ discovery_year <- wildfires %>%
 
 num_year_plot <- ggplot(discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
   geom_line() +
-  labs(title = "Number of Fires Recorded Each Year", x = "Year", y = "Number of Fires") +
+  labs(title = "Total Number of Fires Recorded Each Year, 1992-2015", x = "Year", y = "Number of Fires") +
   geom_smooth(method = "lm", se = F)
 num_year_plot
 
@@ -75,8 +103,65 @@ big_discovery_year <- big_wildfires %>%
 
 big_num_year_plot <- ggplot(big_discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
   geom_line() +
-  labs(title = "Number of Fires >1000 Acres Recorded Each Year", x = "Year", y = "Number of Fires") +
+  labs(title = "Number of Fires >1000 Acres Recorded Each Year, 1992-2015", x = "Year", y = "Number of Fires") +
   geom_smooth(method = "lm", se = F)
 big_num_year_plot
 ```
 
+  > In this comparison, we see that
+  
+$~$
+$~$
+$~$
+
+
+```{r, echo = FALSE}
+# Acreage Burned Per Year
+acreage_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(fire_size = sum(fire_size))
+
+acreage_year_plot <- ggplot(acreage_year, aes(x = `year(disc_clean_date)`, y = fire_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  scale_y_continuous(label = number_format(big.mark = "")) +
+  labs(title = "Acreage Burned Per Year, 1992-2015", x = "Year", y = "Number of Acres Burned") 
+ggplotly(acreage_year_plot)
+```
+
+  > In this graph, we see that
+  
+$~$
+$~$
+$~$
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+year_month_breakdown <- wildfires %>% 
+  group_by(month(disc_clean_date), year(disc_clean_date)) %>% 
+  summarize(total_fire_size = sum(fire_size))
+
+year_month_breakdown <- year_month_breakdown %>% 
+  mutate(date = make_date(year = `year(disc_clean_date)`, month = `month(disc_clean_date)`))
+
+layout_ggplotly <- function(gg, x = -0.02, y = -0.1){
+  # The 1 and 2 goes into the list that contains the options for the x and y axis labels respectively
+  gg[['x']][['layout']][['annotations']][[1]][['y']] <- x
+  gg[['x']][['layout']][['annotations']][[2]][['x']] <- y
+  gg
+}
+
+year_month_size_plot <- ggplot(year_month_breakdown, aes(x = date, y = total_fire_size)) +
+  geom_col() +
+  scale_x_discrete(limits = month.abb) +
+  labs(title = "Acreage Burned Each Month, 1992-2015", x = "Month", y = "Total Acreage Burned", fill = "Month") +
+  scale_y_continuous(labels = number_format(big.mark = "")) +
+  facet_wrap(~`year(disc_clean_date)`, scales = "free_x", nrow = 2)
+ggplotly(year_month_size_plot) %>% 
+  layout_ggplotly()
+```
+
+  > In this graph, we see that
+  
+$~$
+$~$
+$~$
