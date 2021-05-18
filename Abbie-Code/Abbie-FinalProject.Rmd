@@ -223,12 +223,22 @@ mean_size_cause_plot <- ggplot(mean_size_cause, aes(x = stat_cause_descr, y = av
   geom_col()
 mean_size_cause_plot
 
+mean_boxplot <- ggplot(wildfires, aes(x = stat_cause_descr, y = fire_size)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = number)
+ggplotly(mean_boxplot)
+
+
 median_size_cause <- wildfires %>% 
   group_by(stat_cause_descr) %>% 
   summarize(median_size = median(fire_size))
 median_size_cause_plot <- ggplot(median_size_cause, aes(x = stat_cause_descr, y = median_size)) +
   geom_col()
 median_size_cause_plot
+
+cause_plot <- ggplot(cause, aes(x = stat_cause_descr, y = n)) +
+  geom_col()
+cause_plot
 ```
 
 ```{r}
