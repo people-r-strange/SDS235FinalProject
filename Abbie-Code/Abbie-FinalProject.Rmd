@@ -9,9 +9,441 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(lubridate)
+library(plotly)
+library(scales)
 ```
 
 ```{r}
-wildfires <- read.csv("/Users/Abbie/OneDrive - Smith College/Spring 2021/SDS235/Wildfires+Weather/FW_Veg_Rem_Combined.csv")
+wildfires <- read.csv("FW_Veg_Rem_Combined.csv")
+wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
 ```
+
+```{r}
+weather_data <- wildfires %>% 
+  filter(weather_file != "File Not Found") %>% 
+  mutate(temp_f = ((9/5)*Temp_cont + 32)) %>% 
+  mutate(wind_mph = 2.237*Wind_cont) %>% 
+  mutate(precip_in = Prec_cont/25.4)
+
+# filtered_weather_data <- weather_data %>% 
+#   filter(Temp_pre_30 != 0.00000000 & Temp_pre_15 != 0.00000000 & Temp_pre_7 != 0.00000000 & Temp_cont != 0.00000000 & Wind_pre_30 != 0.00000000 & Wind_pre_15 != 0.00000000 & Wind_pre_7 != 0.00000000 & Wind_cont != 0.00000000 & Hum_pre_30 != 0.00000000 & Hum_pre_15 != 0.00000000 & Hum_pre_7 != 0.00000000 & Hum_cont != 0.00000000 & Prec_pre_30 != 0.00000000 & Prec_pre_15 != 0.00000000 & Prec_pre_7 != 0.00000000 & Prec_cont != 0.00000000)
+
+filtered_weather_data <- weather_data %>% 
+  filter(Temp_pre_30 != 0.00000000 | Temp_pre_15 != 0.00000000 | Temp_pre_7 != 0.00000000 | Temp_cont != 0.00000000 | Wind_pre_30 != 0.00000000 | Wind_pre_15 != 0.00000000 | Wind_pre_7 != 0.00000000 | Wind_cont != 0.00000000 | Hum_pre_30 != 0.00000000 | Hum_pre_15 != 0.00000000 | Hum_pre_7 != 0.00000000 | Hum_cont != 0.00000000 | Prec_pre_30 != 0.00000000 | Prec_pre_15 != 0.00000000 | Prec_pre_7 != 0.00000000 | Prec_cont != 0.00000000) 
+```
+
+```{r}
+big_wildfires <- wildfires %>% 
+  filter(fire_size_class == "F" | fire_size_class == "G")
+
+big_wildfires_weather <- filtered_weather_data %>% 
+  filter(fire_size_class == "F" | fire_size_class == "G")
+```
+
+
+```{r}
+# Filtering states
+AK <- wildfires %>% 
+  filter(state == "AK")
+
+AL <- wildfires %>% 
+  filter(state == "AL")
+
+AZ <- wildfires %>% 
+  filter(state == "AZ")
+
+AR <- wildfires %>% 
+  filter(state == "AR")
+
+CA <- wildfires %>% 
+  filter(state == "CA")
+
+CO <- wildfires %>% 
+  filter(state == "CO")
+
+CT <- wildfires %>% 
+  filter(state == "CT")
+
+DE <- wildfires %>% 
+  filter(state == "DE")
+
+FL <- wildfires %>% 
+  filter(state == "FL")
+
+GA <- wildfires %>% 
+  filter(state == "GA")
+
+HI <- wildfires %>% 
+  filter(state == "HI")
+
+ID <- wildfires %>% 
+  filter(state == "ID")
+
+IL <- wildfires %>% 
+  filter(state == "IL")
+
+IN <- wildfires %>% 
+  filter(state == "IN")
+
+IA <- wildfires %>% 
+  filter(state == "IA")
+
+KS <- wildfires %>% 
+  filter(state == "KS")
+
+KY <- wildfires %>% 
+  filter(state == "KY")
+
+LA <- wildfires %>% 
+  filter(state == "LA")
+
+ME <- wildfires %>% 
+  filter(state == "ME")
+
+MD <- wildfires %>% 
+  filter(state == "MD")
+
+MA <- wildfires %>% 
+  filter(state == "MA")
+
+MI <- wildfires %>% 
+  filter(state == "MI")
+
+MN <- wildfires %>% 
+  filter(state == "MN")
+
+MS <- wildfires %>% 
+  filter(state == "MS")
+
+MO <- wildfires %>% 
+  filter(state == "MO")
+
+MT <- wildfires %>% 
+  filter(state == "MI")
+
+NE <- wildfires %>% 
+  filter(state == "NE")
+
+NV <- wildfires %>% 
+  filter(state == "NV")
+
+NH <- wildfires %>% 
+  filter(state == "NH")
+
+NJ <- wildfires %>% 
+  filter(state == "NJ")
+
+NM <- wildfires %>% 
+  filter(state == "NM")
+
+NY <- wildfires %>% 
+  filter(state == "NY")
+
+NC <- wildfires %>% 
+  filter(state == "NC")
+
+ND <- wildfires %>% 
+  filter(state == "ND")
+
+OH <- wildfires %>% 
+  filter(state == "OH")
+
+OK <- wildfires %>% 
+  filter(state == "OK")
+
+OR <- wildfires %>% 
+  filter(state == "OR")
+
+PA <- wildfires %>% 
+  filter(state == "PA")
+
+RI <- wildfires %>% 
+  filter(state == "RI")
+
+SC <- wildfires %>% 
+  filter(state == "SC")
+
+SD <- wildfires %>% 
+  filter(state == "SD")
+
+TN <- wildfires %>% 
+  filter(state == "TN")
+
+TX <- wildfires %>% 
+  filter(state == "TX")
+
+UT <- wildfires %>% 
+  filter(state == "UT")
+
+VT <- wildfires %>% 
+  filter(state == "VT")
+
+VA <- wildfires %>% 
+  filter(state == "VA")
+
+WA <- wildfires %>% 
+  filter(state == "WA")
+
+WV <- wildfires %>% 
+  filter(state == "WV")
+
+WI <- wildfires %>% 
+  filter(state == "WI")
+
+WY <- wildfires %>% 
+  filter(state == "WY")
+
+PR <- wildfires %>% 
+  filter(state == "PR")
+```
+
+```{r}
+# QUESTION: Should the plots that don't involve weather data still use the filtered weather data set to keep things consistent?
+```
+
+```{r}
+# Cause of Fire
+cause <- wildfires %>% 
+  group_by(stat_cause_descr) %>% 
+  count(stat_cause_descr)
+
+cause_by_state <- wildfires %>% 
+  group_by(state, stat_cause_descr) %>% 
+  count(stat_cause_descr)
+
+cause_size <- ggplot(big_wildfires, aes(x = stat_cause_descr, y = fire_size)) +
+  geom_point()
+cause_size
+
+mean_size_cause <- wildfires %>% 
+  group_by(stat_cause_descr) %>% 
+  summarize(average_size = mean(fire_size))
+mean_size_cause_plot <- ggplot(mean_size_cause, aes(x = stat_cause_descr, y = average_size)) +
+  geom_col()
+mean_size_cause_plot
+
+mean_boxplot <- ggplot(wildfires, aes(x = stat_cause_descr, y = fire_size)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = number)
+ggplotly(mean_boxplot)
+
+
+median_size_cause <- wildfires %>% 
+  group_by(stat_cause_descr) %>% 
+  summarize(median_size = median(fire_size))
+median_size_cause_plot <- ggplot(median_size_cause, aes(x = stat_cause_descr, y = median_size)) +
+  geom_col()
+median_size_cause_plot
+
+cause_plot <- ggplot(cause, aes(x = stat_cause_descr, y = n)) +
+  geom_col()
+cause_plot
+```
+
+```{r}
+discovery_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(year(disc_clean_date))
+
+num_year_plot <- ggplot(discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line() +
+  labs(title = "Number of Fires Recorded Each Year", x = "Year", y = "Number of Fires") +
+  geom_smooth(method = "lm", se = F)
+num_year_plot
+```
+
+```{r}
+big_discovery_year <- big_wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(year(disc_clean_date))
+
+big_num_year_plot <- ggplot(big_discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line() +
+  labs(title = "Number of Fires >1000 Acres Recorded Each Year", x = "Year", y = "Number of Fires") +
+  geom_smooth(method = "lm", se = F)
+big_num_year_plot
+```
+
+```{r}
+acreage_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(fire_size = sum(fire_size))
+
+acreage_year_plot <- ggplot(acreage_year, aes(x = `year(disc_clean_date)`, y = fire_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Acreage Burned Per Year", x = "Year", y = "Number of Acres Burned") 
+acreage_year_plot
+```
+
+```{r}
+big_acreage_year <- big_wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(fire_size = sum(fire_size))
+
+big_acreage_year_plot <- ggplot(big_acreage_year, aes(x = `year(disc_clean_date)`, y = fire_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Acreage Burned Per Year (From Wildfires >1000 Acres)", x = "Year", y = "Number of Acres Burned")
+big_acreage_year_plot
+```
+
+
+```{r}
+# Needs work:
+acreage_state_year <- wildfires %>% 
+  group_by(year(disc_clean_date), state) %>% 
+  summarize(fire_size = sum(fire_size))
+
+acreage_state_plot <- ggplot(acreage_state_year, aes(x = `year(disc_clean_date)`, y = fire_size, fill = state)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~state) +
+  labs(title = "Acres Burned in Each State Each Year", x = "Year", y = "Acres Burned")
+acreage_state_plot
+```
+
+
+```{r}
+month_breakdown <- wildfires %>% 
+  group_by(month(disc_clean_date)) %>% 
+  count(month(disc_clean_date))
+
+month_breakdown$`month(disc_clean_date)` = month.abb[month_breakdown$`month(disc_clean_date)`]
+
+
+month_plot <- ggplot(month_breakdown, aes(x = `month(disc_clean_date)`, y = n)) +
+  geom_col() +
+  scale_x_discrete(limits = month.abb) +
+  labs(title = "Number of Fires Started in Each Month", x = "Month", y = "Number of Fires")
+month_plot
+```
+
+
+```{r}
+# Needs work:
+year_month_breakdown <- wildfires %>% 
+  group_by(month(disc_clean_date), year(disc_clean_date)) %>% 
+  summarize(total_fire_size = sum(fire_size))
+
+# year_month_breakdown$`month(disc_clean_date)` = month.abb[year_month_breakdown$`month(disc_clean_date)`]
+
+year_month_breakdown <- year_month_breakdown %>% 
+  mutate(date = make_date(year = `year(disc_clean_date)`, month = `month(disc_clean_date)`))
+
+
+year_month_size_plot <- ggplot(year_month_breakdown, aes(x = date, y = total_fire_size)) +
+  geom_col() +
+  scale_x_discrete(limits = month.abb) +
+  labs(title = "Acreage Burned Each Month", x = "Month", y = "Total Acreage Burned", fill = "Month") +
+  scale_y_continuous(labels = number) +
+  facet_wrap(~`year(disc_clean_date)`, scales = "free_x", nrow = 3)
+ggplotly(year_month_size_plot)
+```
+
+```{r}
+fire_class_breakdown <- wildfires %>% 
+  group_by(fire_size_class) %>% 
+  count(fire_size_class)
+
+fire_class_plot <- ggplot(fire_class_breakdown, aes(x = fire_size_class, y = n)) +
+  geom_col() +
+  labs(title = "Number of Fires by Class Size", x = "Class Size", y = "Number of Fires", caption = "Note there are no fires of class size A recorded in the subset even though they make up nearly 1/3 of entries in the original data set")
+fire_class_plot
+```
+
+```{r}
+# year_fire_class_breakdown <- big_wildfires %>% 
+#   group_by(year(disc_clean_date), fire_size_class) %>% 
+#   count(fire_size_class)
+
+size_histogram <- ggplot(big_wildfires, aes(x = fire_size)) +
+  geom_histogram(binwidth = 5000) +
+  labs(title = "Number of Fires >1000 Acres", x = "Class Size", y = "Number of Fires") +
+  scale_x_continuous(labels = number) +
+  facet_wrap(~year(disc_clean_date), scales = "free_x", nrow = 3)
+ggplotly(size_histogram)
+```
+
+```{r}
+num_g_fires <- wildfires %>% 
+  filter(fire_size_class == "G") %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(fire_size_class)
+
+g_plot <- ggplot(num_g_fires, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line() +
+  labs(title = "Number Class G Fires (>5000 Acres)", x = "Year", y = "Number of Fires >5000 Acres")
+g_plot
+```
+
+```{r}
+average_size_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(mean_size = mean(fire_size))
+
+average_size_plot <- ggplot(average_size_year, aes(x = `year(disc_clean_date)`, y = mean_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Average Size of Fire Each Year", x = "Year", y = "Average Size of Fire (in Acres)")
+average_size_plot
+
+```
+
+
+```{r}
+median_size_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(median_size = median(fire_size))
+
+median_size_plot <- ggplot(median_size_year, aes(x = `year(disc_clean_date)`, y = median_size)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Median Size of Fire Each Year", x = "Year", y = "Median Size of Fire (in Acres)")
+median_size_plot
+```
+
+```{r}
+size_v_remoteness <- ggplot(big_wildfires, aes(x = remoteness, y = fire_size)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Fire Size vs. Remoteness", x = "Remoteness Coefficient", y = "Fire Size (in acres)") +
+  scale_y_continuous(labels = number)
+size_v_remoteness
+```
+
+
+```{r}
+mean_temp <- filtered_weather_data %>% 
+  group_by(year(disc_clean_date)) %>% 
+  summarize(mean = mean(temp_f))
+
+mean_temp_plot <- ggplot(mean_temp, aes(x = `year(disc_clean_date)`, y = mean)) +
+  geom_line() +
+  labs(title = "Mean Temperature on Day of Fire Containment Each Year", x = "Year", y = "Temperature (°F)")
+mean_temp_plot
+```
+
+
+```{r}
+# Might want to change to Temp_pre_30 as there's much less missing data -> did but not very helpful
+size_v_temp <- ggplot(filtered_weather_data, aes(x = temp_f, y = fire_size)) +
+  geom_point() +
+  labs(title = "Fire Size vs. Temperature", x = "Temperature (°F)", y = "Fire Size (in acres)", caption = "Note there is an anomaly near 32°F because we believe that 0 is used as a filler value for missing data, and 0°C = 32°F") +
+  geom_smooth(method = "lm")
+size_v_temp
+```
+
+
+```{r}
+# Might want to change to Wind_pre_30 as there's much less missing data
+size_v_wind <- ggplot(filtered_weather_data, aes(x = wind_mph, y = fire_size)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Fire Size vs. Wind Speed", x = "Wind Speed (in mph)", y = "Fire Size (in acres)", caption = "Note there is an anomaly at 0 because we believe that 0 is used as a filler value for missing data") +
+  scale_y_continuous(labels = number)
+size_v_wind
+```
+
+
 
