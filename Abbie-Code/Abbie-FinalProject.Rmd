@@ -346,9 +346,10 @@ fire_class_breakdown <- wildfires %>%
   group_by(fire_size_class) %>% 
   count(fire_size_class)
 
-fire_class_plot <- ggplot(fire_class_breakdown, aes(x = fire_size_class, y = n)) +
-  geom_col() +
-  labs(title = "Number of Fires by Class Size", x = "Class Size", y = "Number of Fires", caption = "Note there are no fires of class size A recorded in the subset even though they make up nearly 1/3 of entries in the original data set")
+fire_class_plot <- ggplot(wildfires, aes(x = fire_size_class)) +
+  geom_bar() +
+  facet_wrap(~year(disc_clean_date), nrow = 3) +
+  labs(title = "Number of Fires by Class Size", x = "Class Size", y = "Number of Fires", caption = "Note there are no fires of class size A recorded in the subset even though they make up nearly 1/3 of entries in the original data set") 
 fire_class_plot
 ```
 
