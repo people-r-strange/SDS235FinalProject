@@ -15,7 +15,7 @@ library(scales)
 ```
 
 ```{r}
-wildfires <- read.csv("/Users/Abbie/OneDrive - Smith College/Spring 2021/SDS235/Wildfires+Weather/FW_Veg_Rem_Combined.csv")
+wildfires <- read.csv("FW_Veg_Rem_Combined.csv")
 wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
 ```
 
