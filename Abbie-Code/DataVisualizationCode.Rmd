@@ -5,12 +5,78 @@ date: "5/17/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(lubridate)
 library(plotly)
 library(scales)
+```
+
+```{r, include = FALSE}
+# Load files
+wildfires <- read.csv("/Users/Abbie/OneDrive - Smith College/Spring 2021/SDS235/Wildfires+Weather/FW_Veg_Rem_Combined.csv")
+wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
+```
+
+```{r, include = FALSE}
+# Create initial weather data frame
+weather_data <- wildfires %>% 
+  filter(weather_file != "File Not Found") %>% 
+  mutate(temp_f = ((9/5)*Temp_cont + 32)) %>% 
+  mutate(wind_mph = 2.237*Wind_cont) %>% 
+  mutate(precip_in = Prec_cont/25.4)
+
+# Filter rows where all the weather-related values are 0
+filtered_weather_data <- weather_data %>% 
+  filter(Temp_pre_30 != 0.00000000 | Temp_pre_15 != 0.00000000 | Temp_pre_7 != 0.00000000 | Temp_cont != 0.00000000 | Wind_pre_30 != 0.00000000 | Wind_pre_15 != 0.00000000 | Wind_pre_7 != 0.00000000 | Wind_cont != 0.00000000 | Hum_pre_30 != 0.00000000 | Hum_pre_15 != 0.00000000 | Hum_pre_7 != 0.00000000 | Hum_cont != 0.00000000 | Prec_pre_30 != 0.00000000 | Prec_pre_15 != 0.00000000 | Prec_pre_7 != 0.00000000 | Prec_cont != 0.00000000) 
+
+# Filter only the wildfires that are bigger than 1000 acres
+big_wildfires <- wildfires %>% 
+  filter(fire_size_class == "F" | fire_size_class == "G")
+
+# Filter only the wildfires that are bigger than 1000 acres from the weather data
+big_wildfires_weather <- filtered_weather_data %>% 
+  filter(fire_size_class == "F" | fire_size_class == "G")
+```
+
+```{r, echo = FALSE}
+# Cause vs. Average Size of Fire
+mean_size_cause <- wildfires %>% 
+  group_by(stat_cause_descr) %>% 
+  summarize(average_size = mean(fire_size))
+
+mean_size_cause_plot <- ggplot(mean_size_cause, aes(x = reorder(stat_cause_descr, -average_size), y = average_size)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "Average Size of Fire, by Supposed Cause, 1992-2015", x = "Supposed Cause of Fire", y = "Average Size of Fire (in Acres)")
+ggplotly(mean_size_cause_plot)
+```
+
+
+```{r, echo = FALSE, fig.show = "hold", out.width = "50%"}
+# Number of Fires Each Year
+discovery_year <- wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(year(disc_clean_date))
+
+num_year_plot <- ggplot(discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line() +
+  labs(title = "Number of Fires Recorded Each Year", x = "Year", y = "Number of Fires") +
+  geom_smooth(method = "lm", se = F)
+num_year_plot
+
+
+# Number of Large Fires Each Year
+big_discovery_year <- big_wildfires %>% 
+  group_by(year(disc_clean_date)) %>% 
+  count(year(disc_clean_date))
+
+big_num_year_plot <- ggplot(big_discovery_year, aes(x = `year(disc_clean_date)`, y = n)) +
+  geom_line() +
+  labs(title = "Number of Fires >1000 Acres Recorded Each Year", x = "Year", y = "Number of Fires") +
+  geom_smooth(method = "lm", se = F)
+big_num_year_plot
 ```
 
