@@ -88,22 +88,10 @@ iconsS <- makeAwesomeIcon(
   markerColor = "blue"
 )
 
-library(sf)
-
-#sample_tibble <- sample_tibble %>%
-  #st_as_sf(coords = c("longitude", "latitude")) %>%
-  #mutate(cause = paste("Cause:", stat_cause_descr)) %>%
-  #mutate(size = paste("Size:", fire_size, "acres"))
-
 library(tigris)
 library(leaflet)
 
 states <- states(cb = TRUE)
-
-#nevada1 <- c("NV")
-#nevada <- states(cb = TRUE) %>%
- # filter_state(states, nevada1)
-
 
 getmap <- function(state_abr) {
   map <- states %>% 
@@ -144,8 +132,6 @@ getmap <- function(state_abr) {
   return(leaflet_map)
   
 }
-
-getmap("NV")
 
 ```
 
