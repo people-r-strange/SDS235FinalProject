@@ -9,6 +9,10 @@ output:
 runtime: shiny
 ---
 
+```{r include=FALSE}
+library (png)
+```
+
 
 
 States
@@ -43,16 +47,6 @@ Row
 
 Data Visualizations
 =======================================================================
-Sidebar {.sidebar}
-----------------------------------------------------------------------
-
-```{r}
-#Define inputs for Drop Down Menu
- selectInput("State", label = h3("Select a State"), 
-    choices = list("AL" = 1, "AK" = 2, "AZ" = 3, "AR" = 4, "CA" = 5),
-    selected = 20)
-```
-
 Row
 -----------------------------------------------------------------------
 ### Data Viz #1
@@ -76,13 +70,73 @@ Row
 Row
 -----------------------------------------------------------------------
 ### Data Viz #5
+
 ```{r}
-#Insert code for data viz #5
+
 ```
-### Data Viz #6
-```{r}
-#Insert code for data viz #6
-```
+
+What is an Acre? 
+=======================================================================
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+### **5 acres**
+
+**Fire Class B**
+
+One city block is about **5 acres**
+
+![Example of a City Block](city-block.png) 
+
+### **15 acres**
+
+**Fire Class C**
+
+Ground Zero 
+
+(where the Twin Towers used to be)
+
+was **14.6 acres** 
+
+![Ground Zero](zero.png) 
+
+### **150 acres** 
+
+**Fire Class D** 
+
+Roosevelt Island is 
+
+a little less than **150 acres**
+
+![Roosevelt Island](koroo.png) 
+
+### **850 acres**
+
+**Fire Class E** 
+
+Central Park is 
+
+**842.6 acres** 
+
+![Central Park, NY](Central-Park.png) 
+
+### **3,000 acres** 
+
+**Fire Class F** 
+
+East Harlem, New York
+
+is a little less than **3,000 acres**
+
+![East Harlem, NY](east-harlem.png) 
+
+### **10,000 acres**
+
+**Fire Class G**
+
+The borough of Manhattan is a little over **10,000 acres** large
+
+![Manhattan, NY](mahattan.png)
 
 
 About
@@ -90,23 +144,7 @@ About
 
 **Notes:**
 
-* There are some duplicate rows
-
-* Some rows are missing weather data
-
-* Not all of the columns are documented in the documentation file
-
-* Some of the weather data is completely unrealistic: 
-
-For example, if you sort Temp_pre_30 by lowest to highest, it lists -49°C (-56°F) in Tennessee in November. The lowest recorded temp ever in TN is -32°F.  Also, if you sort highest to lowest and look a few columns over it lists 52°C (125°F) for Wyoming in September.  The highest recorded temperature ever in WY is 115°F. 
-
-* This sample does not include any fires that are class A, which means greater than 0 but less than or equal to 0.25 acres, and there are a significant number of them in the big original data set (almost ⅓ of all fires)
-
-**References:**
-
-* https://stackoverflow.com/questions/36020146/how-can-i-order-the-months-chronologically-in-ggplot2-short-of-writing-the-month
-
-* https://stackoverflow.com/questions/22058393/convert-a-numeric-month-to-a-month-abbreviation/22058435
+* This sample and accompanying visualizations do not include any fires that are class A (<0.25 acres)
 
 **Original Dataset**
 
