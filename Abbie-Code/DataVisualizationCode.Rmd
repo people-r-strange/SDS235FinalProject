@@ -1,0 +1,16 @@
+---
+title: "Data Visualization"
+author: "Abbie Benfield"
+date: "5/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(scales)
+```
+
