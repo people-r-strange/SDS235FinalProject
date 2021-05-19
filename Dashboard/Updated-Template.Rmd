@@ -469,6 +469,7 @@ a little over **10,000 acres** large
 
 About
 =======================================================================
+The Wildfire Tracker was built as the final project for the SDS 235: Visual Analytics course at Smith College. The team, self-named Fire Power, was made up of Abbie Benfield, Isabel Gomez, Vivienne Maxwell & Corrina Pascale. 
 
 **Notes:**
 
