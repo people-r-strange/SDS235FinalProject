@@ -11,6 +11,11 @@ runtime: shiny
 
 ```{r include=FALSE}
 library (png)
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(scales)
 ```
 
 
@@ -99,6 +104,12 @@ Data Visualizations
 =======================================================================
 Row
 -----------------------------------------------------------------------
+
+```{r, include = FALSE}
+# Load files
+wildfires <- read_csv("~Dashboard/FW_Veg_Rem_Combined_1.csv")
+wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
+```
 ### Data Viz #1
 ```{r}
 #Insert code for data viz #1
