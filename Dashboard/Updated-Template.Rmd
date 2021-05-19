@@ -3,7 +3,7 @@ title: "WildFire Tracker"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
-    vertical_layout: fill
+    vertical_layout: scroll
     social: menu
     theme: bootstrap
 runtime: shiny
@@ -105,11 +105,6 @@ Data Visualizations
 Row
 -----------------------------------------------------------------------
 
-```{r, include = FALSE}
-# Load files
-wildfires <- read_csv("~Dashboard/FW_Veg_Rem_Combined_1.csv")
-wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
-```
 ### Data Viz #1
 ```{r}
 #Insert code for data viz #1
@@ -139,7 +134,7 @@ Row
 What is an Acre? 
 =======================================================================
 
-Row {.tabset .tabset-fade}
+Row {.tabset .tabset-fade} 
 -------------------------------------
 ### **5 acres**
 
