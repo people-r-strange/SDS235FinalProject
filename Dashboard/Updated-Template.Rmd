@@ -25,11 +25,11 @@ library(readr)
 library(ggthemes)
 library(tigris)
 library (png)
-library(readr)
 library(tidyverse)
 library(lubridate)
 library(scales)
 library(miniUI)
+library(sf)
 
 # Read in data
 wildfires <- read_csv("FW_Veg_Rem_Combined.csv")
