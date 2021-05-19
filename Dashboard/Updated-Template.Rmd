@@ -24,16 +24,23 @@ library(maptools)
 library(readr)
 library(ggthemes)
 library(tigris)
+library (png)
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(scales)
 
 # Read in data, and subset for the selected metro
 #full_tracts <- readRDS('full_simp2.rds')
-wildfires <- read_csv("C:/Users/igome/Documents/Smith/Spring_2021/visual analyticsd/Final Project/FW_Veg_Rem_Combined.csv")
+wildfires <- read_csv("../FW_Veg_Rem_Combined.csv")
 states <- states(cb = TRUE)
 map <- reactive({
   m <- states %>%
     filter(STUSPS == input$variable)
   return(m)
 })
+
 ```
 
 
@@ -99,7 +106,6 @@ Sidebar {.sidebar}
               "West Virginia" = "WV",
               "Wisconsin" = "WI",
               "Wyoming" = "WY"))
-
 ```
 
 ### Introduction
@@ -201,6 +207,13 @@ Data Visualizations
 =======================================================================
 Row
 -----------------------------------------------------------------------
+
+
+```{r, include = FALSE}
+# Load files
+#wildfires <- read_csv("~Dashboard/FW_Veg_Rem_Combined_1.csv")
+wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
+```
 ### Data Viz #1
 ```{r}
 #Insert code for data viz #1

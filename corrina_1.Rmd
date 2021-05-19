@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
-wildfires <- read_csv("FW_Veg_Rem_Combined.csv")
+wildfires <- read_csv("Dashboard/FW_Veg_Rem_Combined.csv")
 ```
 
 # unused :
