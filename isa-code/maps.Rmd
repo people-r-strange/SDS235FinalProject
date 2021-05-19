@@ -28,11 +28,16 @@ nv_sample <-fire_df %>% filter(state =="NV")
 
 #states second try
 
-states <- states(cb = TRUE)
+
 
 nevada_map <- states %>% 
   filter(STATEFP == 32)
 
+```
+
+
+```{r}
+states <- states(cb = TRUE)
 ```
 
 
@@ -52,10 +57,10 @@ sample_tibble %>%
 
 
 ```{r}
-leaflet::leaflet(nevada_map) %>% 
+leaflet::leaflet(states) %>% 
   addTiles() %>%
-  leaflet::addPolygons(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(sample_tibble$fire_size), fillOpacity = 0.7,
-    label = ~lapply(sample_tibble$fire_size, htmltools::HTML),
+  leaflet::addPolygons(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(df$avg_fire_size), fillOpacity = 0.7,
+    label = ~lapply(df$avg_fire_size, htmltools::HTML),
     labelOptions = leaflet::labelOptions(direction = "top"),
     highlight = leaflet::highlightOptions(
       color = "#FFF", bringToFront = TRUE
@@ -69,6 +74,9 @@ coordinates(ar_sample) <- c("longitude", "latitude")
 proj4string(ar_sample) <- CRS("+proj=longlat +datum=WGS84") 
 ```
 
+```{r}
+View(fire_df)
+```
 
 
 ```{r}
@@ -76,6 +84,14 @@ pal <- leaflet::colorNumeric(
   "YlOrRd",
   domain = sample_tibble$fire_size
 )
+```
+
+```{r}
+df <- fire_df %>% group_by(state) %>% 
+  mutate(avg_fire_size = mean(fire_size), 
+         mode_fire_class = mode(fire_size_class))
+
+df %>% unique(avg_fire_size)
 ```
 
 
@@ -101,18 +117,30 @@ state_fires <- function(st){
   #create the leaflet map
   leaflet::leaflet(ak) %>% 
   addTiles() %>%
-  leaflet::addPolygons(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(sample_tibble$fire_size), fillOpacity = 0.7,
-    label = ~lapply(sample_tibble$fire_size, htmltools::HTML),
+  leaflet::addPolygons(col = "#222", weight = 2, smoothFactor = 0.5, opacity = 1, fillColor = ~pal(mean(sample_tibble$fire_size)), fillOpacity = 0.7,
+    label = ~lapply(mean(sample_tibble$fire_size), htmltools::HTML),
     labelOptions = leaflet::labelOptions(direction = "top"),
     highlight = leaflet::highlightOptions(
       color = "#FFF", bringToFront = TRUE
     )) %>% 
    leaflet::addLegend(
-     pal = pal, values = ~sample_tibble$fire_size, opacity = 0.7,
+     pal = pal, values = ~mean(sample_tibble$fire_size), opacity = 0.7,
      title = "Fire Size", position = "topleft"
    )}
 
 ```
+
+```{r}
+nv_sample$fire_size
+```
+
+
+```{r}
+ggplot(df, aes(y = avg_fire_size)) +
+  geom_boxplot()
+  
+```
+
 
 
 ```{r}

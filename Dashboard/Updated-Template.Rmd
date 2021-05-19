@@ -10,7 +10,30 @@ runtime: shiny
 ---
 
 ```{r include=FALSE}
-library (png)
+library(shiny)
+library(leaflet) # devtools::install_github('rstudio/leaflet')
+library(highcharter) # devtools::install_github('jbkunst/highcharter')
+library(plotly) # devtools::install_github('ropensci/plotly')
+library(ggplot2) # devtools::install_github('hadley/ggplot2')
+library(sp)
+library(dplyr)
+library(flexdashboard) # devtools::install_github('rstudio/flexdashboard')
+library(rgeos)
+library(mapproj)
+library(maptools)
+library(readr)
+library(ggthemes)
+library(tigris)
+
+# Read in data, and subset for the selected metro
+#full_tracts <- readRDS('full_simp2.rds')
+wildfires <- read_csv("C:/Users/igome/Documents/Smith/Spring_2021/visual analyticsd/Final Project/FW_Veg_Rem_Combined.csv")
+states <- states(cb = TRUE)
+map <- reactive({
+  m <- states %>%
+    filter(STUSPS == input$variable)
+  return(m)
+})
 ```
 
 
@@ -88,6 +111,84 @@ Row
 
 ```{r}
 #Insert Code for US Fire Distribution Map Here
+# Draw the map without selected tracts
+
+
+iconsL <- reactive({
+  iconsL <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "red"
+)
+})
+
+iconsM <- reactive({
+  iconsM <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "orange"
+)
+})
+
+iconsS <- reactive({
+  iconsS <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "blue"
+)
+})
+
+firesL <- reactive({
+  firesL <- wildfires %>%
+    filter(state == input$variable) %>%
+    filter(fire_size_class == "F" | fire_size_class == "G")
+  return(firesL)
+})
+
+firesM <- reactive({
+  firesM <- wildfires %>%
+    filter(state == input$variable) %>%
+    filter(fire_size_class == "D" | fire_size_class == "E")
+  return(firesM)
+})
+
+firesS <- reactive({
+  firesS <- wildfires %>%
+    filter(state == input$variable) %>%
+    filter(fire_size_class == "B" | fire_size_class == "C")
+  return(firesS)
+})
+output$map <- renderLeaflet({
+    
+    leaflet_map <- leaflet(map()) %>%
+      addProviderTiles('CartoDB.Positron') %>%
+      addPolygons(fillColor = "white",
+              color = "black",
+              weight = 0.5) %>%
+  setView(-98.5795, 39.8282, zoom=3) %>%
+  addTiles() %>%
+      addAwesomeMarkers(~firesL()$longitude, ~firesL()$latitude, icon = iconsL(), 
+                  popup = paste("Cause:", firesL()$stat_cause_descr, "<br>",
+                           "Size:", firesL()$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesL()$disc_clean_date), group = "Large") %>%
+  addAwesomeMarkers(~firesM()$longitude, ~firesM()$latitude, icon = iconsM(), 
+                  popup = paste("Cause:", firesM()$stat_cause_descr, "<br>",
+                           "Size:", firesM()$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesM()$disc_clean_date), group = "Medium") %>%
+    addAwesomeMarkers(~firesS()$longitude, ~firesS()$latitude, icon = iconsS(), 
+                  popup = paste("Cause:", firesS()$stat_cause_descr, "<br>",
+                           "Size:", firesS()$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesS()$disc_clean_date), group = "Small") %>%
+  addLayersControl(overlayGroups = c("Large", "Medium", "Small"), options = layersControlOptions(collapsed = FALSE))
+    
+    leaflet_map
+    
+  })
+leafletOutput('map')  
+
 ```
 
 
