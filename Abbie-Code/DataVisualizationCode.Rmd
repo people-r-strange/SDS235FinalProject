@@ -5,7 +5,11 @@ output: html_document
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+<<<<<<< HEAD
 library(readr)
+=======
+
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
 library(tidyverse)
 library(lubridate)
 library(plotly)
@@ -14,7 +18,11 @@ library(scales)
 
 ```{r, include = FALSE}
 # Load files
+<<<<<<< HEAD
 wildfires <- read_csv("Abbie-Code/FW_Veg_Rem_Combined.csv")
+=======
+wildfires <- read.csv("FW_Veg_Rem_Combined.csv")
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
 wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
 ```
 
@@ -56,7 +64,11 @@ average_size_plot <- ggplot(average_size_year, aes(x = `year(disc_clean_date)`, 
 ggplotly(average_size_plot)
 ```
 
+<<<<<<< HEAD
   > This graph shows that between 1992 and 2015, there was a significant upward trend in the average size of wildfires in the United States.
+=======
+  > In this graph, we see that 
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
   
 $~$
 $~$
@@ -76,7 +88,11 @@ mean_size_cause_plot <- ggplot(mean_size_cause, aes(x = reorder(stat_cause_descr
 ggplotly(mean_size_cause_plot)
 ```
 
+<<<<<<< HEAD
   > This graph suggests that lightning strikes caused considerably larger fires between 1992 and 2015.
+=======
+  > In this graph, we see that (note different scale of axes)
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
   
 $~$
 $~$
@@ -108,7 +124,11 @@ big_num_year_plot <- ggplot(big_discovery_year, aes(x = `year(disc_clean_date)`,
 big_num_year_plot
 ```
 
+<<<<<<< HEAD
   > (Note the different scales on the y-axes) This comparison indicates that even though there was not a large increase in the total number of fires between 1992 and 2015, there was a more significant upward trend in the number of large fires greater than 1000 acres during that same period.
+=======
+  > In this comparison, we see that
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
   
 $~$
 $~$
@@ -129,7 +149,11 @@ acreage_year_plot <- ggplot(acreage_year, aes(x = `year(disc_clean_date)`, y = f
 ggplotly(acreage_year_plot)
 ```
 
+<<<<<<< HEAD
   > This graph shows that the total number of acres burned substantially increased during the period from 1992 to 2015. 
+=======
+  > In this graph, we see that
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
   
 $~$
 $~$
@@ -160,10 +184,17 @@ ggplotly(year_month_size_plot) %>%
   layout_ggplotly()
 ```
 
+<<<<<<< HEAD
   > This graph shows the seasonal trend of wildfires, along with the upward trend in how much more area is burned by wildfires by the end of this approximately 20-year period.
+=======
+  > In this graph, we see that
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b
   
 $~$
 $~$
 $~$
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> b1da1b6ec896f27b5c685ed1c9c4085c91451a7b

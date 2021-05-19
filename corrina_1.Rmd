@@ -14,28 +14,40 @@ library(tidyverse)
 wildfires <- read_csv("FW_Veg_Rem_Combined.csv")
 ```
 
-```{r}
-cause_freq <- wildfires %>%
-  group_by(stat_cause_descr) %>%
-  summarize(frequency = n())
+# unused :
 
-cause_plot <- ggplot(data = wildfires, aes(x = stat_cause_descr)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-cause_plot
-```
 ```{r}
 wildfires_sample <- wildfires %>%
   head(5)
 
+getColor <- function(wildfires) {
+  sapply(wildfires$fire_size_class, function(fire_size_class) {
+  if(fire_size_class == "B") {
+    "blue"
+  } else if(fire_size_class == "C") {
+    "green"
+  } else if(fire_size_class == "D") {
+    "yellow"
+  } else if(fire_size_class == "E") {
+    "orange"
+  } else if(fire_size_class == "F") {
+    "red"
+  } else {
+    "purple"
+  } })
+}
+
 # convert to tibble 
-sample_tibble <- as_tibble(wildfires_sample)
-class(sample_tibble)
+sample_tibble <- as_tibble(wildfires_sample) %>%
+  mutate(color = getColor(sample_tibble))
 
-library(sf)
+getColor(sample_tibble)
+```
+### use this plus initial import code : 
 
-sample_tibble %>%
-  st_as_sf(coords = c("longitude", "latitude"))
+# US map:
 
+```{r}
 library(tigris)
 library(leaflet)
 
@@ -46,11 +58,116 @@ leaflet(states) %>%
   addPolygons(fillColor = "white",
               color = "black",
               weight = 0.5) %>%
+  setView(-98.5795, 39.8282, zoom=3)
+```
+
+
+
+### State maps:
+
+```{r}
+
+iconsL <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "red"
+)
+
+iconsM <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "orange"
+)
+
+iconsS <- makeAwesomeIcon(
+  icon = 'flame',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = "blue"
+)
+
+library(tigris)
+library(leaflet)
+
+states <- states(cb = TRUE)
+
+getmap <- function(state_abr) {
+  map <- states %>% 
+  filter(STUSPS == state_abr)
+  
+  firesL <- wildfires %>%
+  filter(state == state_abr) %>%
+  filter(fire_size_class == "F" | fire_size_class == "G")
+  
+  firesM <- wildfires %>%
+    filter(state == state_abr) %>%
+    filter(fire_size_class == "D" | fire_size_class == "E")
+  
+  firesS <- wildfires %>%
+  filter(state == state_abr) %>%
+  filter(fire_size_class == "B" | fire_size_class == "C")
+  
+  leaflet_map <- leaflet(map) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = "white",
+              color = "black",
+              weight = 0.5) %>%
   setView(-98.5795, 39.8282, zoom=3) %>%
   addTiles() %>%
-  addMarkers(~sample_tibble$longitude, ~sample_tibble$latitude,
-                  popup = ~sample_tibble$X1, label = ~sample_tibble$X1)
-  #addMarkers(data = sample_tibble, popup = ~X1)
+  addAwesomeMarkers(~firesL$longitude, ~firesL$latitude, icon = iconsL, 
+                  popup = paste("Cause:", firesL$stat_cause_descr, "<br>",
+                           "Size:", firesL$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesL$disc_clean_date), group = "Large") %>%
+  addAwesomeMarkers(~firesM$longitude, ~firesM$latitude, icon = iconsM, 
+                  popup = paste("Cause:", firesM$stat_cause_descr, "<br>",
+                           "Size:", firesM$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesM$disc_clean_date), group = "Medium") %>%
+    addAwesomeMarkers(~firesS$longitude, ~firesS$latitude, icon = iconsS, 
+                  popup = paste("Cause:", firesS$stat_cause_descr, "<br>",
+                           "Size:", firesS$fire_size, "acres", "<br>",
+                           "Date Discovered:", firesS$disc_clean_date), group = "Small") %>%
+  addLayersControl(overlayGroups = c("Large", "Medium", "Small"), options = layersControlOptions(collapsed = FALSE))
+  return(leaflet_map)
+  
+}
+
+```
+
+```{r}
+# original code:
+
+nevada_map <- states %>% 
+  filter(STUSPS == "NV")
+
+nevada_firesL <- wildfires %>%
+  filter(state == "NV") %>%
+  filter(fire_size_class == "D" | fire_size_class == "E" | fire_size_class == "f" | fire_size_class == "G")
+
+nevada_firesS <- wildfires %>%
+  filter(state == "NV") %>%
+  filter(fire_size_class == "B" | fire_size_class == "C")
+
+leaflet(nevada_map) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = "white",
+              color = "black",
+              weight = 0.5) %>%
+  setView(-98.5795, 39.8282, zoom=3) %>%
+  addTiles() %>%
+  addAwesomeMarkers(~nevada_firesL$longitude, ~nevada_firesL$latitude, icon = iconsL, 
+                  popup = paste("Cause:", nevada_firesL$stat_cause_descr, "<br>",
+                           "Size:", nevada_firesL$fire_size, "acres", "<br>",
+                           "Date Discovered:", nevada_firesL$disc_clean_date), group = "Large") %>%
+  addAwesomeMarkers(~nevada_firesS$longitude, ~nevada_firesS$latitude, icon = iconsS, 
+                  popup = paste("Cause:", nevada_firesS$stat_cause_descr, "<br>",
+                           "Size:", nevada_firesS$fire_size, "acres", "<br>",
+                           "Date Discovered:", nevada_firesS$disc_clean_date), group = "Small") %>%
+  addLayersControl(overlayGroups = c("large", "Small"), options = layersControlOptions(collapsed = FALSE))
+
+
+
 ```
 State shapefiles: 
 https://rdrr.io/cran/tigris/man/states.html
