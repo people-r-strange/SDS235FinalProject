@@ -28,13 +28,14 @@ library (png)
 library(readr)
 library(tidyverse)
 library(lubridate)
-library(plotly)
 library(scales)
 library(miniUI)
 
 # Read in data
-wildfires <- read_csv("../FW_Veg_Rem_Combined.csv")
+wildfires <- read_csv("FW_Veg_Rem_Combined.csv")
 wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
+
+wild_2015 <- subset(wildfires, disc_clean_date> "2014-01-01" & disc_clean_date < "2014-12-31")
 states <- states(cb = TRUE)
 map <- reactive({
   m <- states %>%
@@ -47,6 +48,7 @@ big_wildfires <- wildfires %>%
   filter(fire_size_class == "F" | fire_size_class == "G")
 
 ```
+
 
 
 
@@ -113,6 +115,36 @@ Sidebar {.sidebar}
               "Wyoming" = "WY"))
 ```
 
+
+```{r}
+#Define inputs for Drop Down Menu
+ selectInput( "year", "Select a Year:",
+              c("1992" = "1992",
+              "1993" = "1993",
+              "1994" = "1994",
+              "1995" = "1995",
+              "1996" = "1996",
+              "1997" = "1997",
+              "1998" = "1998",
+              "1999" = "1999",
+              "2000" = "2000",
+              "2001" = "2001",
+              "2002" = "2002",
+              "2003" = "2003",
+              "2004" = "2004",
+              "2005" = "2005",
+              "2006" = "2006",
+              "2007" = "2007",
+              "2008" = "2008",
+              "2009" = "2009",
+              "2010" = "2010",
+              "2011" = "2011",
+              "2012" = "2012",
+              "2013" = "2013",
+              "2014" = "2014",
+              "2015" = "2015"))
+```
+
 ### Introduction
 
 In recent years there has been an increase in the number of wildfires in the United States. Wildfires have an immediate and long-term impact on people's lives as they can easily displace people from their home and also release large quantities of carbon dioxide, carbon monoxide and fine particulate matter into the atmosphere. This increase in air pollution causes health issues such as exacerbating pre-existing conditions and creating respiratory issues. Many organizations project an increase in wildfires as early as 2060 in the U.S. The time is now to learn about wild fires, what human-activity causes them and what places see the most wildfires.
@@ -129,6 +161,9 @@ Click on a pop-up to learn more about the fire classifcation and causes.
 ```{r}
 #Insert Code for US Fire Distribution Map Here
 # Draw the map without selected tracts
+
+wild_year<- reactive({
+  subset(wildfires, disc_clean_date> paste0(input$year,"-01-01") & disc_clean_date < paste0(input$year, "-12-31")) })
 
 
 iconsL <- reactive({
@@ -159,21 +194,21 @@ iconsS <- reactive({
 })
 
 firesL <- reactive({
-  firesL <- wildfires %>%
+  firesL <- wild_year()  %>%
     filter(state == input$variable) %>%
     filter(fire_size_class == "F" | fire_size_class == "G")
   return(firesL)
 })
 
 firesM <- reactive({
-  firesM <- wildfires %>%
+  firesM <- wild_year()  %>%
     filter(state == input$variable) %>%
     filter(fire_size_class == "D" | fire_size_class == "E")
   return(firesM)
 })
 
 firesS <- reactive({
-  firesS <- wildfires %>%
+  firesS <- wild_year()  %>%
     filter(state == input$variable) %>%
     filter(fire_size_class == "B" | fire_size_class == "C")
   return(firesS)
@@ -190,15 +225,15 @@ output$map <- renderLeaflet({
       addAwesomeMarkers(~firesL()$longitude, ~firesL()$latitude, icon = iconsL(), 
                   popup = paste("Cause:", firesL()$stat_cause_descr, "<br>",
                            "Size:", firesL()$fire_size, "acres", "<br>",
-                           "Date Discovered:", firesL()$disc_clean_date), group = "Large") %>%
+                           "Date Discovered:", firesL()$disc_clean_date), group = "Large (Red)") %>%
   addAwesomeMarkers(~firesM()$longitude, ~firesM()$latitude, icon = iconsM(), 
                   popup = paste("Cause:", firesM()$stat_cause_descr, "<br>",
                            "Size:", firesM()$fire_size, "acres", "<br>",
-                           "Date Discovered:", firesM()$disc_clean_date), group = "Medium") %>%
+                           "Date Discovered:", firesM()$disc_clean_date), group = "Medium (Orange)") %>%
     addAwesomeMarkers(~firesS()$longitude, ~firesS()$latitude, icon = iconsS(), 
                   popup = paste("Cause:", firesS()$stat_cause_descr, "<br>",
                            "Size:", firesS()$fire_size, "acres", "<br>",
-                           "Date Discovered:", firesS()$disc_clean_date), group = "Small") %>%
+                           "Date Discovered:", firesS()$disc_clean_date), group = "Small (Blue)") %>%
   addLayersControl(overlayGroups = c("Large (Red)", "Medium (Orange)", "Small (Blue)"), options = layersControlOptions(collapsed = FALSE))
     
     leaflet_map
@@ -208,11 +243,28 @@ leafletOutput('map')
 
 ```
 
+Row
+--------------------------------------------------------------------------------
+### Fire Causes by State
+```{r}
+# Cause vs. Average Size of Fire
 
-<!-- ### Fire Size by Census Tract -->
-<!-- ```{r} -->
-<!-- #Insert Code for US Fire Size by Census Tract Map Here -->
-<!-- ``` -->
+wildfire_state <-  reactive({ wildfires %>% filter(state == input$variable, disc_clean_date> paste0(input$year,"-01-01") & disc_clean_date < paste0(input$year, "-12-31")) })
+  
+output$state_fire_cause <- renderPlotly({
+mean_size_cause <- wildfire_state() %>% 
+  group_by(stat_cause_descr) %>% 
+  summarize(average_size = mean(fire_size))
+
+mean_size_cause_plot <- ggplot(mean_size_cause, aes(x = reorder(stat_cause_descr, -average_size), y = average_size)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = paste0("Average Size of Fire in ", input$variable, " by Supposed Cause in ", input$year), x = "Supposed Cause of Fire", y = "Average Size of Fire (in Acres)")
+fire_cause_plot <- ggplotly(mean_size_cause_plot)
+})
+
+plotlyOutput("state_fire_cause", width = "80%", height ="80%")
+```
 
 Data Visualizations
 =======================================================================
@@ -220,17 +272,18 @@ Data Visualizations
 Sidebar {.sidebar}
 ----------------------------------------------------------------------
 
-**Total Number of Fires Recorded Each Year, 1992-2015 vs. Numer of Fires >1000 Acres Recorded Each Year, 1992-2015**
+**Number of Fires**
 
 In this side by side graph, we observe the total number of fires that occurred each year compared against the total number of fires exceeding 1000 acres for each year. In both graphs, we observe a positive linear trend, which indicates that over time the number of fires is increasing. This is not surprising as climate change has affected weather patterns and devastating wildfires have been a common occurrence, particularly in warmer climates such as California. The increase and decrease in the number of fires exceeding 1000 acres could be explained by vegetation regrowth. It would make sense that for some years large amounts of acreage is burned as there is readily available vegetation to burn. For succeeding years, there will likely be less amounts of acreages burned as the vegetation has not yet had a change to regrow. This cyclical relationship is observed in the graph on the right. 
 
 
-**Acreage Burned Per Year, 1992-2015**
+**Acreage Burned**
 In this graph, we observe an overall increase in the amount of acreage burned per year. However, this relationship is not consistently increasing. As aforementioned, this makes sense, as it takes time for large amounts of burned vegetation to regrow and provide fuel for new fires. It is remarkable that in the years succeeding 2005, significant amounts of vegetation area burned (>7.5 million acres). For reference, 7.5 million acres is comparable to double the area of Hudson Valley (see “What is an acre?” for a better visual representation). 
 
+**Average Fire Size**
+In this graph, we observe an overall increase in the average fire size per year.It interesting to see that there was a peak in 2004 and in 2015 there appears to be a new peak emerging. 
 
-
-**Average Size of Fire, by Supposed Cause, 1992-2015**
+**Fire Causes**
 This visualization provides insight into the causes of fires. As illustrated, a fire that burns an area the size of Manhattan (10,000 acres) is caused by lightning. This is remarkable and frustrating for concerned citizens and state officials alike, as lightning strikes are not easily predictable. The unpredictable nature of larger fires could incentivize preventative measures, such as controlled fires, so as to reduce the detrimental effects of fires caused by lightning. Powerlines and campfires burn on average an area the size of East Harlem (2,500 acres). Whether or not these sources are preventable is context-dependent. Oftentimes powerlines fall as a result of a storm or other extreme weather events. In this way, powerlines are also an unpredictable cause. However, campfires could be forbidden in the warmer months, when we expect to see a surge in wildfires. This could decrease the number of wildfires occurring in warmer months. 
 
 
@@ -360,7 +413,7 @@ Row {.tabset .tabset-fade}
 
 One city block is about **5 acres**
 
-![Example of a City Block](city-block.png) 
+![Example of a City Block](city-block.png){width=40%} 
 
 ### **15 acres**
 
@@ -372,7 +425,7 @@ Ground Zero
 
 was **14.6 acres** 
 
-![Ground Zero](zero.png) 
+![Ground Zero](zero.png)
 
 ### **150 acres** 
 
@@ -382,7 +435,7 @@ Roosevelt Island is
 
 a little less than **150 acres**
 
-![Roosevelt Island](koroo.png) 
+![Roosevelt Island](koroo.png){width=40%}  
 
 ### **850 acres**
 
@@ -392,7 +445,7 @@ Central Park is
 
 **842.6 acres** 
 
-![Central Park, NY](Central-Park.png) 
+![Central Park, NY](Central-Park.png){width=70%}  
 
 ### **3,000 acres** 
 
@@ -402,23 +455,17 @@ East Harlem, New York
 
 is a little less than **3,000 acres**
 
-![East Harlem, NY](east-harlem.png) 
+![East Harlem, NY](east-harlem.png){width=40%} 
 
 ### **10,000 acres**
 
 **Fire Class G**
 
-The borough of Manhattan is a little over **10,000 acres** large
+The borough of Manhattan is 
 
-![Manhattan, NY](mahattan.png)
+a little over **10,000 acres** large
 
-### **900,000 acres**
-Long Island is a little under **900,000 acres**
-![Long Island, NY](long-island.png)
-
-### **4.5 million acres**
-Hudson Valley is spans a little over **4.5 million acres**
-![Hudson Valley, NY](hudson-valley.png)
+![Manhattan, NY](mahattan.png){width=40%} 
 
 About
 =======================================================================

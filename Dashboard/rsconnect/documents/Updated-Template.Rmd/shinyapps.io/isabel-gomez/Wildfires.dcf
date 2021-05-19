@@ -1,0 +1,13 @@
+name: Wildfires
+title: Wildfires
+username:
+account: isabel-gomez
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4154228
+bundleId: 4617427
+url: https://isabel-gomez.shinyapps.io/Wildfires/
+when: 1621452402.10002
+lastSyncTime: 1621452402.10002
+asMultiple: FALSE
+asStatic: FALSE
