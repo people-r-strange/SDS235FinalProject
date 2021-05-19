@@ -104,9 +104,16 @@ Data Visualizations
 =======================================================================
 Row
 -----------------------------------------------------------------------
+<<<<<<< HEAD
 ```{r}
 # Load files
 wildfires <- read_csv("Dashboard/FW_Veg_Rem_Combined_1.csv")
+=======
+
+```{r, include = FALSE}
+# Load files
+wildfires <- read_csv("~Dashboard/FW_Veg_Rem_Combined_1.csv")
+>>>>>>> 9f6fa3affc0847aa4ac7d75117787d3f48281273
 wildfires$disc_clean_date <- as.Date(wildfires$disc_clean_date, format = "%m/%d/%Y")
 ```
 ### Data Viz #1
